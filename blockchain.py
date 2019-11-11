@@ -1,6 +1,10 @@
 # Initializing blockchain list
-
-blockchain = []
+genesis_block = {'previous_hash': '',
+                 'index': 0,
+                 'transaction': []}
+blockchain = [genesis_block]
+open_transactions = []
+owner = 'Dash'
 
 
 def get_last_blockchain_value():
@@ -10,23 +14,38 @@ def get_last_blockchain_value():
     return blockchain[-1]
 
 
-def add_transaction(transaction_amount, last_transaction=[3]):
+def add_transaction(recipient, sender=owner, amount=1.0):
     """ Append a new value to the kast blockchian
 
     Arguments:
-        :transaction_amount: The amount that should be added.
-        :last_transaction: The previous transaction value
+        :sender: The sender of the coins
+        :recipient: The recipeient
+        :amount: The amount to be send(default = 1.0)
     """
-    if last_transaction == None:
-        last_transaction = [1]
+    transaction = {'sender': sender,
+                   'recipient': recipient,
+                   'amount': amount}
 
-    blockchain.append([last_transaction, transaction_amount])
-    print(blockchain)
+    open_transactions.append(transaction)
+
+
+def mine_block():
+
+    last_block = blockchain[-1]
+    hashed_block = '-'.join(str([last_block[key] for key in last_block]))
+    print(hashed_block)
+
+    block = {'previous_hash': hashed_block,
+             'index': len(blockchain),
+             'transaction': open_transactions}
+    blockchain.append(block)
 
 
 def get_transaction_value():
     """ Returns the transaction input by the user """
-    return int(input('Your tarnsaction amount please: '))
+    tx_recipient = input('Enter the recipient of the transaction:')
+    tx_amount = float(input('Your tarnsaction amount please: '))
+    return tx_recipient, tx_amount  # tuple
 
 
 def get_user_choice():
@@ -47,7 +66,7 @@ def verify_chain():
 
     for block_index in range(len(blockchain)):
         if block_index == 0:
-                continue
+            continue
         elif blockchain[block_index][0] == blockchain[block_index - 1]:
             is_valid = True
         else:
@@ -72,27 +91,32 @@ waiting_for_input = True
 while waiting_for_input:
     print('Please choose')
     print('1: Add a new transaction value')
-    print('2: Output the blocks')
-    print('3: Manipulat the block chain')
-    print('4: quit')
+    print('2: Mine a new Block')
+    print('3: Output the blocks')
+    print('4: Manipulat the block chain')
+    print('5: quit')
     user_choice = get_user_choice()
 
     if user_choice == 1:
-        tx_amount = get_transaction_value()
-        add_transaction(tx_amount, get_last_blockchain_value())
+        tx_data = get_transaction_value()
+        recipient, amount = tx_data
+        add_transaction(recipient, amount=amount)
+        print(open_transactions)
     elif user_choice == 2:
-        print_blockchain_element()
+        mine_block()
     elif user_choice == 3:
+        print_blockchain_element()
+    elif user_choice == 4:
         if len(blockchain) >= 1:
             blockchain[0] = [2]
-    elif user_choice == 4:
+    elif user_choice == 5:
         waiting_for_input = False
     else:
         print('Invalid input, please pick from the list')
-    if not verify_chain():
-        print_blockchain_element()
-        print('Invalid blockchain')
-        break
+    # if not verify_chain():
+    #     print_blockchain_element()
+    #     print('Invalid blockchain')
+    #     break
 else:
     print('User Left')
 

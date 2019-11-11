@@ -53,6 +53,7 @@ def get_user_choice():
     return user_input
 
 
+
 def print_blockchain_element():
     for block in blockchain:
         print(block)

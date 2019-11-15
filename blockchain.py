@@ -1,3 +1,4 @@
+import functools
 # Initializing blockchain list
 MINING_REWARD = 10
 
@@ -18,18 +19,15 @@ def get_balance(participant):
     tx_sender = [[tx['amount'] for tx in block['transaction']
                   if tx['sender'] == participant] for block in blockchain]
 
-    amount_sent = 0
-    for tx in tx_sender:
-        if len(tx) > 0:
-            amount_sent += tx[0]
+    amount_sent = functools.reduce(lambda tx_sum, tx_amt: tx_sum + tx_amt[0] if len(tx_amt) > 0 else 0, tx_sender, 0)
 
     tx_recipient = [[tx['amount'] for tx in block['transaction']
                      if tx['recipient'] == participant] for block in blockchain]
 
-    amount_recieved = 0
-    for tx in tx_recipient:
-        if len(tx) > 0:
-            amount_recieved += tx[0]
+    amount_recieved = functools.reduce(lambda tx_sum, tx_amt: tx_sum + tx_amt[0] if len(tx_amt) > 0 else 0, tx_recipient, 0 )
+
+    print('amount_recieved', amount_recieved)
+    print('amount_sent', amount_sent)
 
     return amount_recieved - amount_sent
 
@@ -56,6 +54,7 @@ def add_transaction(recipient, sender=owner, amount=1.0):
                    'recipient': recipient,
                    'amount': amount}
 
+    print('transaction: ', transaction)
     if verify_transaction(transaction):
         open_transactions.append(transaction)
         participants.add(sender)
@@ -123,8 +122,8 @@ while waiting_for_input:
     print('3: Output the blocks')
     print('4: Print participants')
     print('5: check transaction validity')
-    print('5: Manipulat the block chain')
-    print('6: quit')
+    print('6: Manipulat the block chain')
+    print('7: quit')
     user_choice = get_user_choice()
 
     if user_choice == 1:
@@ -157,7 +156,7 @@ while waiting_for_input:
         print_blockchain_element()
         print('Invalid blockchain')
         break
-    print(get_balance('Dash'))
+    print('Balance of {}:{:6.2f}'.format('Dash',get_balance('Dash')))
 else:
     print('User Left')
 

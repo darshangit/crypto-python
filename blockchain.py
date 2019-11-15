@@ -19,12 +19,14 @@ def get_balance(participant):
     tx_sender = [[tx['amount'] for tx in block['transaction']
                   if tx['sender'] == participant] for block in blockchain]
 
-    amount_sent = functools.reduce(lambda tx_sum, tx_amt: tx_sum + tx_amt[0] if len(tx_amt) > 0 else 0, tx_sender, 0)
+    amount_sent = functools.reduce(
+        lambda tx_sum, tx_amt: tx_sum + sum(tx_amt) if len(tx_amt) > 0 else tx_sum + 0, tx_sender, 0)
 
     tx_recipient = [[tx['amount'] for tx in block['transaction']
                      if tx['recipient'] == participant] for block in blockchain]
 
-    amount_recieved = functools.reduce(lambda tx_sum, tx_amt: tx_sum + tx_amt[0] if len(tx_amt) > 0 else 0, tx_recipient, 0 )
+    amount_recieved = functools.reduce(
+        lambda tx_sum, tx_amt: tx_sum + sum(tx_amt) if len(tx_amt) > 0 else tx_sum + 0, tx_recipient, 0)
 
     print('amount_recieved', amount_recieved)
     print('amount_sent', amount_sent)
@@ -38,9 +40,11 @@ def get_last_blockchain_value():
         return None
     return blockchain[-1]
 
+
 def verify_transaction(tranasction):
     sender_balance = get_balance(tranasction['sender'])
     return sender_balance >= tranasction['amount']
+
 
 def add_transaction(recipient, sender=owner, amount=1.0):
     """ Append a new value to the kast blockchian
@@ -61,6 +65,7 @@ def add_transaction(recipient, sender=owner, amount=1.0):
         participants.add(recipient)
         return True
     return False
+
 
 def mine_block():
 
@@ -111,7 +116,8 @@ def verify_chain():
 
 
 def verify_transactions():
-   return all([verify_transaction(tx) for tx in open_transactions])
+    return all([verify_transaction(tx) for tx in open_transactions])
+
 
 waiting_for_input = True
 
@@ -156,7 +162,7 @@ while waiting_for_input:
         print_blockchain_element()
         print('Invalid blockchain')
         break
-    print('Balance of {}:{:6.2f}'.format('Dash',get_balance('Dash')))
+    print('Balance of {}:{:6.2f}'.format('Dash', get_balance('Dash')))
 else:
     print('User Left')
 
